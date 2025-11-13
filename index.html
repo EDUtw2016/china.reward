@@ -548,12 +548,12 @@
 
     // 生成按鈕
     document.getElementById("btnGenerate").addEventListener("click", function() {
-      const name = document.getElementById("inputName").value.trim() || "某某";
+      const name = toSimplified(document.getElementById("inputName").value.trim()) || "某某";
       const gender = document.getElementById("inputGender").value;
-      const identity = document.getElementById("inputIdentity").value.trim();
+      const identity = toSimplified(document.getElementById("inputIdentity").value.trim());
       let rewardMin = parseInt(document.getElementById("inputRewardMin").value, 10);
       let rewardMax = parseInt(document.getElementById("inputRewardMax").value, 10);
-      const reason = document.getElementById("inputReason").value;
+      const reason = toSimplified(document.getElementById("inputReason").value.trim());
       const areaLetter = document.getElementById("inputHousehold").value || null;
 
       if (isNaN(rewardMin) || rewardMin <= 0) rewardMin = 5;
@@ -582,15 +582,49 @@
     });
 
     // 一鍵下載 PNG
-    document.getElementById("btnDownload").addEventListener("click", function() {
-      const poster = document.getElementById("poster");
-      html2canvas(poster, { scale: 2 }).then(canvas => {
-        const link = document.createElement("a");
-        link.href = canvas.toDataURL("image/png");
-        link.download = `reward_poster_${Date.now()}.png`;
-        link.click();
-      });
-    });
+   document.getElementById("btnDownload").addEventListener("click", function() {
+  const poster = document.getElementById("poster");
+
+  // 粗略判斷是不是手機
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  // 手機用低一點的 scale，減少記憶體壓力
+  const scale = isMobile ? 1 : 2;
+
+  html2canvas(poster, {
+    scale,
+    useCORS: true,
+    allowTaint: true,
+    width: poster.clientWidth,
+    height: poster.clientHeight,
+    windowWidth: poster.clientWidth,
+    windowHeight: poster.clientHeight
+  }).then(canvas => {
+    const dataUrl = canvas.toDataURL("image/png");
+
+    if (isMobile) {
+      // 手機：開新視窗顯示圖片，讓使用者自己長按儲存，避免直接下載閃退
+      const win = window.open();
+      if (win) {
+        win.document.title = "懸賞通告";
+        win.document.body.style.margin = "0";
+        win.document.body.innerHTML =
+          '<img src="' + dataUrl + '" style="width:100%;height:auto;display:block;">';
+      } else {
+        // 如果被瀏覽器擋彈窗，就直接導向圖片
+        window.location.href = dataUrl;
+      }
+    } else {
+      // 電腦版：直接觸發下載
+      const link = document.createElement("a");
+      link.href = dataUrl;
+      link.download = `reward_poster_${Date.now()}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  });
+});
 
     // 初始先生成一次預設
     document.getElementById("btnGenerate").click();

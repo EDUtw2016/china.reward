@@ -53,17 +53,25 @@
     .form-group input[type="file"] {
       font-size: 13px;
     }
+    .button-row {
+      display: flex;
+      gap: 8px;
+    }
     button {
-      padding: 8px 16px;
+      padding: 8px 14px;
       border-radius: 999px;
       border: none;
       cursor: pointer;
       font-size: 14px;
       background: #2563eb;
       color: #fff;
+      white-space: nowrap;
+    }
+    #btnDownload {
+      background: #059669;
     }
     button:hover {
-      background: #1d4ed8;
+      filter: brightness(0.95);
     }
 
     /* 懸賞通告樣式 */
@@ -84,48 +92,53 @@
     .poster-header {
       background: #0046a5;
       color: #fff;
-      padding: 12px 16px;
+      padding: 10px 20px;
       display: flex;
       align-items: center;
       gap: 16px;
     }
     .badge {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      border: 3px solid #ffd54f;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      text-align: center;
-      line-height: 1.1;
+      width: 72px;
+      height: 72px;
+      flex-shrink: 0;
+    }
+    .badge img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
     }
     .poster-title {
       font-size: 32px;
       font-weight: 700;
       letter-spacing: 8px;
     }
+
     .poster-body {
-      padding: 20px 30px 60px;
-      font-size: 15px;
-      line-height: 1.7;
+      position: relative;
+      background: #ffffff;
+    }
+
+    /* 上半部照片 + 淺藍底 */
+    .photo-strip {
+      background: #e5f2ff;
+      padding: 24px 30px 32px;
     }
     .photo-row {
       display: flex;
       gap: 24px;
-      margin-bottom: 16px;
     }
     .photo-block {
       width: 180px;
       text-align: center;
+      margin: 0 auto;
     }
     .photo-frame {
       width: 180px;
       height: 220px;
-      border: 1px solid #d0d4da;
-      margin-bottom: 8px;
-      background: #e5e7eb;
+      border: 1px solid #9ca3af;
+      margin: 0 auto 10px;
+      background: #ffffff;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -137,15 +150,27 @@
       object-fit: cover;
     }
     .name-line {
-      font-size: 18px;
+      font-size: 20px;
       font-weight: 600;
+      letter-spacing: 4px;
+      margin-bottom: 4px;
     }
     .id-line {
       font-size: 13px;
-      color: #4b5563;
+      color: #374151;
     }
-    .crime-text {
-      flex: 1;
+
+    .divider {
+      height: 1px;
+      background: #d1d5db;
+    }
+
+    /* 下半部正文（白底黑字） */
+    .crime-section {
+      padding: 20px 30px 100px;
+      font-size: 15px;
+      line-height: 1.7;
+      background: #ffffff;
       text-align: justify;
     }
 
@@ -153,21 +178,40 @@
       margin-top: 20px;
       font-size: 14px;
       display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      position: relative;
-    }
-    .tip-text {
-      max-width: 60%;
-      color: #374151;
+      justify-content: flex-end;
     }
     .issuer-text {
-      margin-top: 8px;
       text-align: right;
       font-size: 14px;
+      color: #111827;
     }
 
-    /* 紅色印章 */
+    /* 藍色舉報電話條 */
+    .phone-bar {
+      position: absolute;
+      left: 30px;
+      bottom: 18px;
+      background: #003b8f;
+      color: #ffffff;
+      padding: 6px 14px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+    .phone-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 1px solid #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+    }
+
+    /* 紅色印章 + 五角星 */
     .stamp {
       position: absolute;
       right: 40px;
@@ -186,6 +230,11 @@
       text-align: center;
       pointer-events: none;
     }
+    .stamp-star {
+      font-size: 40px;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
     .stamp-bureau {
       font-weight: 700;
       margin-bottom: 4px;
@@ -203,7 +252,7 @@
 
     <div class="form-group">
       <label>姓名</label>
-      <input type="text" id="inputName" placeholder="例：陳柏源">
+      <input type="text" id="inputName" placeholder="例：經民連">
     </div>
 
     <div class="form-group">
@@ -216,8 +265,40 @@
     </div>
 
     <div class="form-group">
+      <label>戶籍地（決定身分證字首）</label>
+      <select id="inputHousehold">
+        <option value="">隨機</option>
+        <option value="A">台北市 (A)</option>
+        <option value="F">新北市 / 原台北縣 (F)</option>
+        <option value="B">台中市 (B)</option>
+        <option value="D">台南市 (D)</option>
+        <option value="E">高雄市 (E)</option>
+        <option value="C">基隆市 (C)</option>
+        <option value="H">桃園市 / 原桃園縣 (H)</option>
+        <option value="I">嘉義市 (I)</option>
+        <option value="O">新竹市 (O)</option>
+        <option value="G">宜蘭縣 (G)</option>
+        <option value="J">新竹縣 (J)</option>
+        <option value="K">苗栗縣 (K)</option>
+        <option value="L">台中縣 (L)</option>
+        <option value="M">南投縣 (M)</option>
+        <option value="N">彰化縣 (N)</option>
+        <option value="P">雲林縣 (P)</option>
+        <option value="Q">嘉義縣 (Q)</option>
+        <option value="R">台南縣 (R)</option>
+        <option value="S">高雄縣 (S)</option>
+        <option value="T">屏東縣 (T)</option>
+        <option value="U">花蓮縣 (U)</option>
+        <option value="V">台東縣 (V)</option>
+        <option value="X">澎湖縣 (X)</option>
+        <option value="W">金門縣 (W)</option>
+        <option value="Z">連江縣 (Z)</option>
+      </select>
+    </div>
+
+    <div class="form-group">
       <label>身份描述（會寫進內文）</label>
-      <input type="text" id="inputIdentity" placeholder="例：台灣網紅">
+      <input type="text" id="inputIdentity" placeholder="例：台灣民團">
     </div>
 
     <div class="form-group">
@@ -232,7 +313,7 @@
     <div class="form-group">
       <label>犯罪事由（50字內，將嵌入段落）</label>
       <textarea id="inputReason" maxlength="50"
-        placeholder="例：長期在境外社交平台發布煽動分裂言論"></textarea>
+        placeholder="例：長期在台灣島內發動抗中行動"></textarea>
     </div>
 
     <div class="form-group">
@@ -240,8 +321,9 @@
       <input type="file" id="inputPhoto" accept="image/*">
     </div>
 
-    <div class="form-group">
-      <button id="btnGenerate">生成懸賞通告</button>
+    <div class="form-group button-row">
+      <button id="btnGenerate" type="button">生成懸賞通告</button>
+      <button id="btnDownload" type="button">下載 PNG</button>
     </div>
 
     <p style="font-size:12px;color:#6b7280;margin-top:8px;">
@@ -254,43 +336,59 @@
     <div class="poster" id="poster">
       <div class="poster-header">
         <div class="badge">
-          公安<br>徽記
+          <!-- 請在同資料夾放一張 badge.png 公安徽記圖 -->
+          <img src="badge.png" alt="公安徽記">
         </div>
         <div class="poster-title">悬赏通告</div>
       </div>
+
       <div class="poster-body">
-        <div class="photo-row">
-          <div class="photo-block">
-            <div class="photo-frame">
-              <img id="photoPreview" alt="照片預覽">
+        <!-- 淺藍底照片區 -->
+        <div class="photo-strip">
+          <div class="photo-row">
+            <div class="photo-block">
+              <div class="photo-frame">
+                <img id="photoPreview" alt="照片預覽">
+              </div>
+              <div class="name-line">
+                <span id="posterName">某某</span>
+                <span id="posterGender">男</span>
+              </div>
+              <div class="id-line">
+                中国台湾省身份证号码
+                <span id="posterId">A123456789</span>
+              </div>
             </div>
-            <div class="name-line">
-              <span id="posterName">某某</span>
-              <span id="posterGender">男</span>
-            </div>
-            <div class="id-line">
-              中国台湾省身份证号码
-              <span id="posterId">A123456789</span>
-            </div>
-          </div>
-          <div class="crime-text" id="crimeText">
-            我局工作掌握，某某，長期利用其身份在境外社交平台發布、傳播涉台涉政不實信息，
-            歪曲事實，攻擊抹黑國家和政府形象，煽動部分不明真相群眾產生對立情緒，
-            造成惡劣社會影響，其行為已觸犯《中華人民共和國刑法》第一百零三條之規定，
-            涉嫌煽動分裂國家罪……
           </div>
         </div>
 
-        <div class="footer-info">
-          <div class="tip-text">
-            举报电话：请广大群众积极通过12345政务服务热线或就近公安机关提供线索。
+        <div class="divider"></div>
+
+        <!-- 白底正文區 -->
+        <div class="crime-section">
+          <div id="crimeText">
+            我局工作掌握，某某，台灣居民，長期在境外社交平台發布、傳播涉台涉政不實信息，
+            惡意攻擊抹黑國家和政府形象，煽動部分不明真相群眾產生敵對情緒，
+            造成惡劣社會影響，其行為已觸犯《中華人民共和國刑法》第一百零三條之規定，
+            涉嫌煽動分裂國家罪……
+          </div>
+
+          <div class="footer-info">
             <div class="issuer-text" id="issuerText">
               某某市公安局　<span id="issuerDate">2025年11月13日</span>
             </div>
           </div>
         </div>
 
+        <!-- 藍色舉報電話條 -->
+        <div class="phone-bar">
+          <div class="phone-icon">☎</div>
+          <div class="phone-text">举报电话：请广大群众积极提供线索</div>
+        </div>
+
+        <!-- 紅色印章 -->
         <div class="stamp" id="stamp">
+          <div class="stamp-star">★</div>
           <div class="stamp-bureau" id="stampBureau">某某市公安局</div>
           <div class="stamp-date" id="stampDate">2025年11月13日</div>
         </div>
@@ -298,142 +396,147 @@
     </div>
   </div>
 
-<script>
-  // 中國各地公安局列表（可自行增加）
-  const bureaus = [
-    "北京市公安局",
-    "上海市公安局",
-    "廣州市公安局",
-    "深圳市公安局",
-    "杭州市公安局",
-    "南京市公安局",
-    "成都市公安局",
-    "重慶市公安局",
-    "武漢市公安局",
-    "西安市公安局",
-    "福州市公安局",
-    "廈門市公安局",
-    "青島市公安局",
-    "蘇州市公安局"
-  ];
+  <!-- html2canvas：用來把整個通告轉成 PNG -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
-  // 產生「格式正確但校驗碼錯誤」的台灣身分證號
-  function generateFakeTaiwanId(genderStr) {
-    // 身分證開頭字母對照碼
-    const letters = "ABCDEFGHJKLMNPQRSTUVXYWZIO";
-    const mapping = {
+  <script>
+    // 中國各地公安局列表
+    const bureaus = [
+      "北京市公安局","上海市公安局","廣州市公安局","深圳市公安局","杭州市公安局",
+      "南京市公安局","成都市公安局","重慶市公安局","武漢市公安局","西安市公安局",
+      "福州市公安局","廈門市公安局","青島市公安局","蘇州市公安局"
+    ];
+
+    // 台灣縣市字首對應碼
+    const idMapping = {
       A:10,B:11,C:12,D:13,E:14,F:15,G:16,H:17,J:18,K:19,
       L:20,M:21,N:22,P:23,Q:24,R:25,S:26,T:27,U:28,V:29,
       X:30,Y:31,W:32,Z:33,I:34,O:35
     };
-    const letter = letters[Math.floor(Math.random() * letters.length)];
-    const genderDigit = (genderStr === "女") ? 2 : 1; // 簡單處理，其他就當 1
+    const letterList = "ABCDEFGHJKLMNPQRSTUVXYWZIO";
 
-    const nums = [genderDigit];
-    for (let i = 0; i < 7; i++) {
-      nums.push(Math.floor(Math.random() * 10));
+    // 產生「格式正確但校驗碼錯誤」的台灣身分證號
+    function generateFakeTaiwanId(genderStr, areaLetter) {
+      let letter = areaLetter && idMapping[areaLetter] ? areaLetter : null;
+      if (!letter) {
+        letter = letterList[Math.floor(Math.random() * letterList.length)];
+      }
+
+      const genderDigit = (genderStr === "女") ? 2 : 1;
+      const nums = [genderDigit];
+      for (let i = 0; i < 7; i++) {
+        nums.push(Math.floor(Math.random() * 10));
+      }
+      nums.push(Math.floor(Math.random() * 10)); // 先隨機末位
+
+      const code = idMapping[letter];
+      const c1 = Math.floor(code / 10);
+      const c2 = code % 10;
+
+      const all = [c1, c2].concat(nums);
+      let sum = all[0] + all[1] * 9;
+      let weight = 8;
+      for (let i = 2; i < all.length; i++, weight--) {
+        sum += all[i] * weight;
+      }
+
+      // 若剛好合法，就把最後一碼+1，強制變成不合法
+      if (sum % 10 === 0) {
+        nums[8] = (nums[8] + 1) % 10;
+      }
+      return letter + nums.join("");
     }
-    // 先隨機一個末位數
-    nums.push(Math.floor(Math.random() * 10));
 
-    const code = mapping[letter];
-    const c1 = Math.floor(code / 10);
-    const c2 = code % 10;
+    // 生成簡體字、公安全文風格的犯罪段落（約 300 字）
+    function generateCrimeText(name, identity, reason, rewardMin, rewardMax) {
+      const cleanName = name || "某某";
+      const cleanIdentity = identity || "台湾居民";
+      const cleanReason = (reason || "长期在境外社交平台发布、传播反中抗中言论")
+                            .trim().slice(0, 50);
 
-    // 計算檢查碼
-    const all = [c1, c2].concat(nums);
-    let sum = all[0] + all[1] * 9;
-    let weight = 8;
-    for (let i = 2; i < all.length; i++, weight--) {
-      sum += all[i] * weight;
+      return (
+        `我局工作掌握，${cleanName}，${cleanIdentity}，${cleanReason}，` +
+        `长期利用其身份在境外社交平台发布、传播涉台涉政不实信息，` +
+        `恶意攻击抹黑国家和政府形象，煽动部分不明真相群众产生敌对情绪，` +
+        `多次与境内外分裂势力勾连串联，从事损害国家统一和社会稳定的活动，` +
+        `造成恶劣社会影响。其行为已触犯《中华人民共和国刑法》第一百零三条之规定，涉嫌煽动分裂国家罪。` +
+        `为依法严厉打击破坏国家主权和领土完整的犯罪行为，切实维护国家安全，请广大群众积极提供线索，` +
+        `凡向公安机关提供有效线索的举报人，以及配合公安机关抓获相关犯罪嫌疑人的有功人员，` +
+        `我局将视情给予${rewardMin}万至${rewardMax}万元人民币的奖励。` +
+        `对包庇在逃人员的，将依法追究法律责任。对打击报复举报人的，将依法严惩。`
+      );
     }
 
-    // 若剛好合法，就把最後一碼+1 讓它變成「不合法」
-    if (sum % 10 === 0) {
-      nums[8] = (nums[8] + 1) % 10;
+    function formatCNDate(date = new Date()) {
+      const y = date.getFullYear();
+      const m = date.getMonth() + 1;
+      const d = date.getDate();
+      return `${y}年${m}月${d}日`;
     }
-    return letter + nums.join("");
-  }
 
-  // 生成簡體字、公安全文風格的犯罪段落（約 300 字）
-  function generateCrimeText(name, identity, reason, rewardMin, rewardMax) {
-    const cleanName = name || "某某";
-    const cleanIdentity = identity || "台灣居民";
-    const cleanReason = (reason || "長期在境外社交平台發布、傳播反中抗中言論")
-                          .trim().slice(0, 50);
+    // 照片預覽
+    document.getElementById("inputPhoto").addEventListener("change", function(e) {
+      const file = e.target.files[0];
+      const img = document.getElementById("photoPreview");
+      if (!file) {
+        img.src = "";
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        img.src = evt.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
 
-    // 這裡直接用簡體字撰寫
-    return (
-      `我局工作掌握，${cleanName}，${cleanIdentity}，${cleanReason}，` +
-      `长期利用其身份在境外社交平台发布、传播涉台涉政不实信息，` +
-      `恶意攻击抹黑国家和政府形象，煽动部分不明真相群众产生敌对情绪，` +
-      `多次与境内外分裂势力勾连串联，从事损害国家统一和社会稳定的活动，` +
-      `造成恶劣社会影响。其行为已触犯《中华人民共和国刑法》第一百零三条之规定，涉嫌煽动分裂国家罪。` +
-      `为依法严厉打击破坏国家主权和领土完整的犯罪行为，切实维护国家安全，请广大群众积极提供线索，` +
-      `凡向公安机关提供有效线索的举报人，以及配合公安机关抓获相关犯罪嫌疑人的有功人员，` +
-      `我局将视情给予${rewardMin}万至${rewardMax}万元人民币的奖励。` +
-      `对包庇在逃人员的，将依法追究法律责任。对打击报复举报人的，将依法严惩。`
-    );
-  }
+    // 生成按鈕
+    document.getElementById("btnGenerate").addEventListener("click", function() {
+      const name = document.getElementById("inputName").value.trim() || "某某";
+      const gender = document.getElementById("inputGender").value;
+      const identity = document.getElementById("inputIdentity").value.trim();
+      let rewardMin = parseInt(document.getElementById("inputRewardMin").value, 10);
+      let rewardMax = parseInt(document.getElementById("inputRewardMax").value, 10);
+      const reason = document.getElementById("inputReason").value;
+      const areaLetter = document.getElementById("inputHousehold").value || null;
 
-  function formatCNDate(date = new Date()) {
-    const y = date.getFullYear();
-    const m = date.getMonth() + 1;
-    const d = date.getDate();
-    return `${y}年${m}月${d}日`;
-  }
+      if (isNaN(rewardMin) || rewardMin <= 0) rewardMin = 5;
+      if (isNaN(rewardMax) || rewardMax < rewardMin) rewardMax = rewardMin + 5;
 
-  // 處理照片預覽
-  document.getElementById("inputPhoto").addEventListener("change", function(e) {
-    const file = e.target.files[0];
-    const img = document.getElementById("photoPreview");
-    if (!file) {
-      img.src = "";
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = function(evt) {
-      img.src = evt.target.result;
-    };
-    reader.readAsDataURL(file);
-  });
+      // 姓名 & 性別
+      document.getElementById("posterName").textContent = name;
+      document.getElementById("posterGender").textContent = gender;
 
-  // 生成按鈕
-  document.getElementById("btnGenerate").addEventListener("click", function() {
-    const name = document.getElementById("inputName").value.trim() || "某某";
-    const gender = document.getElementById("inputGender").value;
-    const identity = document.getElementById("inputIdentity").value.trim();
-    let rewardMin = parseInt(document.getElementById("inputRewardMin").value, 10);
-    let rewardMax = parseInt(document.getElementById("inputRewardMax").value, 10);
-    const reason = document.getElementById("inputReason").value;
+      // 身分證號
+      const fakeId = generateFakeTaiwanId(gender, areaLetter);
+      document.getElementById("posterId").textContent = fakeId;
 
-    if (isNaN(rewardMin) || rewardMin <= 0) rewardMin = 5;
-    if (isNaN(rewardMax) || rewardMax < rewardMin) rewardMax = rewardMin + 5;
+      // 犯罪段落（簡體）
+      const crime = generateCrimeText(name, identity, reason, rewardMin, rewardMax);
+      document.getElementById("crimeText").textContent = crime;
 
-    // 更新姓名 & 性別
-    document.getElementById("posterName").textContent = name;
-    document.getElementById("posterGender").textContent = gender;
+      // 公安局 & 日期
+      const bureau = bureaus[Math.floor(Math.random() * bureaus.length)];
+      const dateStr = formatCNDate();
 
-    // 身分證號
-    const fakeId = generateFakeTaiwanId(gender);
-    document.getElementById("posterId").textContent = fakeId;
+      document.getElementById("stampBureau").textContent = bureau;
+      document.getElementById("stampDate").textContent = dateStr;
+      document.getElementById("issuerText").innerHTML =
+        `${bureau}&emsp;<span id="issuerDate">${dateStr}</span>`;
+    });
 
-    // 犯罪段落（簡體）
-    const crime = generateCrimeText(name, identity, reason, rewardMin, rewardMax);
-    document.getElementById("crimeText").textContent = crime;
+    // 一鍵下載 PNG
+    document.getElementById("btnDownload").addEventListener("click", function() {
+      const poster = document.getElementById("poster");
+      html2canvas(poster, { scale: 2 }).then(canvas => {
+        const link = document.createElement("a");
+        link.href = canvas.toDataURL("image/png");
+        link.download = `reward_poster_${Date.now()}.png`;
+        link.click();
+      });
+    });
 
-    // 公安局 & 日期
-    const bureau = bureaus[Math.floor(Math.random() * bureaus.length)];
-    const dateStr = formatCNDate();
-
-    document.getElementById("stampBureau").textContent = bureau;
-    document.getElementById("stampDate").textContent = dateStr;
-    document.getElementById("issuerText").innerHTML = `${bureau}&emsp;<span id="issuerDate">${dateStr}</span>`;
-  });
-
-  // 初始預設一次
-  document.getElementById("btnGenerate").click();
-</script>
-
+    // 初始先生成一次預設
+    document.getElementById("btnGenerate").click();
+  </script>
 </body>
 </html>

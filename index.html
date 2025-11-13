@@ -145,9 +145,10 @@
       overflow: hidden;
     }
     .photo-frame img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: cover;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;   /* 自動裁切滿版 */
+      display: block;
     }
     .name-line {
       font-size: 20px;
@@ -211,7 +212,7 @@
       font-size: 11px;
     }
 
-    /* 紅色印章 + 五角星 */
+    /* 紅色印章 + 大五角星 + 環形單位文字 */
     .stamp {
       position: absolute;
       right: 40px;
@@ -220,27 +221,45 @@
       height: 150px;
       border-radius: 50%;
       border: 4px solid #ef4444;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      transform: rotate(-12deg);
       color: #ef4444;
       font-size: 13px;
       text-align: center;
       pointer-events: none;
+      transform: rotate(-12deg);
     }
     .stamp-star {
-      font-size: 40px;
+      position: absolute;
+      top: 38%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 60px;   /* 星星加大 */
       line-height: 1;
-      margin-bottom: 4px;
     }
-    .stamp-bureau {
+    .stamp-circle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 120px;
+      height: 120px;
+      transform: translate(-50%, -50%);
+    }
+    .stamp-circle span {
+      position: absolute;
+      font-size: 12px;
       font-weight: 700;
-      margin-bottom: 4px;
     }
     .stamp-date {
+      position: absolute;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
       font-size: 12px;
+    }
+
+    /* 粗體底線強調 */
+    .emphasis {
+      font-weight: 700;
+      text-decoration: underline;
     }
   </style>
 </head>
@@ -252,7 +271,7 @@
 
     <div class="form-group">
       <label>姓名</label>
-      <input type="text" id="inputName" placeholder="例：經民連">
+      <input type="text" id="inputName" placeholder="例：陳柏源">
     </div>
 
     <div class="form-group">
@@ -294,12 +313,11 @@
         <option value="W">金門縣</option>
         <option value="Z">連江縣</option>
       </select>
-
     </div>
 
     <div class="form-group">
       <label>身份描述（會寫進內文）</label>
-      <input type="text" id="inputIdentity" placeholder="例：台灣民團">
+      <input type="text" id="inputIdentity" placeholder="例：台灣網紅">
     </div>
 
     <div class="form-group">
@@ -314,7 +332,7 @@
     <div class="form-group">
       <label>犯罪事由（50字內，將嵌入段落）</label>
       <textarea id="inputReason" maxlength="50"
-        placeholder="例：長期在台灣島內發動抗中行動"></textarea>
+        placeholder="例：長期在境外社交平台發布煽動分裂言論"></textarea>
     </div>
 
     <div class="form-group">
@@ -390,7 +408,7 @@
         <!-- 紅色印章 -->
         <div class="stamp" id="stamp">
           <div class="stamp-star">★</div>
-          <div class="stamp-bureau" id="stampBureau">某某市公安局</div>
+          <div class="stamp-circle" id="stampCircle"></div>
           <div class="stamp-date" id="stampDate">2025年11月13日</div>
         </div>
       </div>
@@ -415,6 +433,13 @@
       X:30,Y:31,W:32,Z:33,I:34,O:35
     };
     const letterList = "ABCDEFGHJKLMNPQRSTUVXYWZIO";
+
+    // HTML 字元 escape（避免使用者輸入破版）
+    function escapeHtml(str) {
+      return str.replace(/[&<>"]/g, ch => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"
+      }[ch] || ch));
+    }
 
     // 產生「格式正確但校驗碼錯誤」的台灣身分證號
     function generateFakeTaiwanId(genderStr, areaLetter) {
@@ -448,15 +473,45 @@
       return letter + nums.join("");
     }
 
-    // 生成簡體字、公安全文風格的犯罪段落（約 300 字）
+    // 在紅章上排成環形的單位文字
+    function setStampBureau(bureau) {
+      const circle = document.getElementById("stampCircle");
+      circle.innerHTML = "";
+      const chars = bureau.split("");
+      const radius = 58;
+      const cx = 60;
+      const cy = 60;
+      const startAngle = -Math.PI * 0.9;   // 左上
+      const endAngle   = -Math.PI * 0.1;   // 右上
+      const step = chars.length > 1 ? (endAngle - startAngle) / (chars.length - 1) : 0;
+
+      chars.forEach((ch, i) => {
+        const angle = startAngle + step * i;
+        const x = cx + radius * Math.cos(angle);
+        const y = cy + radius * Math.sin(angle);
+        const span = document.createElement("span");
+        span.textContent = ch;
+        span.style.left = x + "px";
+        span.style.top = y + "px";
+        span.style.transform = `translate(-50%, -50%) rotate(${angle + Math.PI / 2}rad)`;
+        circle.appendChild(span);
+      });
+    }
+
+    // 生成簡體字、公安全文風格的犯罪段落（姓名／身份／事由粗體底線）
     function generateCrimeText(name, identity, reason, rewardMin, rewardMax) {
-      const cleanName = name || "某某";
-      const cleanIdentity = identity || "台湾居民";
-      const cleanReason = (reason || "长期在境外社交平台发布、传播反中抗中言论")
-                            .trim().slice(0, 50);
+      const cleanName = escapeHtml(name || "某某");
+      const cleanIdentity = escapeHtml(identity || "台湾居民");
+      const cleanReason = escapeHtml(
+        (reason || "长期在境外社交平台发布、传播反中抗中言论").trim().slice(0, 50)
+      );
+
+      const emName = `<span class="emphasis">${cleanName}</span>`;
+      const emId   = `<span class="emphasis">${cleanIdentity}</span>`;
+      const emReason = `<span class="emphasis">${cleanReason}</span>`;
 
       return (
-        `我局工作掌握，${cleanName}，${cleanIdentity}，${cleanReason}，` +
+        `我局工作掌握，${emName}，${emId}，${emReason}，` +
         `长期利用其身份在境外社交平台发布、传播涉台涉政不实信息，` +
         `恶意攻击抹黑国家和政府形象，煽动部分不明真相群众产生敌对情绪，` +
         `多次与境内外分裂势力勾连串联，从事损害国家统一和社会稳定的活动，` +
@@ -511,15 +566,15 @@
       const fakeId = generateFakeTaiwanId(gender, areaLetter);
       document.getElementById("posterId").textContent = fakeId;
 
-      // 犯罪段落（簡體）
-      const crime = generateCrimeText(name, identity, reason, rewardMin, rewardMax);
-      document.getElementById("crimeText").textContent = crime;
+      // 犯罪段落（簡體，帶粗體底線）
+      const crimeHtml = generateCrimeText(name, identity, reason, rewardMin, rewardMax);
+      document.getElementById("crimeText").innerHTML = crimeHtml;
 
       // 公安局 & 日期
       const bureau = bureaus[Math.floor(Math.random() * bureaus.length)];
       const dateStr = formatCNDate();
 
-      document.getElementById("stampBureau").textContent = bureau;
+      setStampBureau(bureau);
       document.getElementById("stampDate").textContent = dateStr;
       document.getElementById("issuerText").innerHTML =
         `${bureau}&emsp;<span id="issuerDate">${dateStr}</span>`;
